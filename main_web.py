@@ -1,10 +1,21 @@
+import UserDatabaseAccess
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
 @app.route('/')
+def login():
+    return render_template("login.html")
+
+@app.route('/index', methods=['POST', 'GET'])
 def home():
+    if request.form['action'] == "login":
+        pass
+    elif request.form['action'] == "register":
+        pass
+    else: pass
     return render_template("index.html")
+
 @app.route('/null')
 def null():
     s = []
