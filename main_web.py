@@ -7,25 +7,71 @@ app = Flask(__name__)
 def login():
     return render_template("login.html")
 
-@app.route('/index', methods=['POST', 'GET'])
+@app.route('/index')
 def home():
-    if request.form['action'] == "login":
-        pass
-    elif request.form['action'] == "register":
-        pass
-    else: pass
     return render_template("index.html")
 
-@app.route('/null')
-def null():
+@app.route('/sorting/<algorithm>')
+def sorting(algorithm = ""):
     s = []
     with open("codes/Sorting.py") as f:
         lines = f.readlines()
         i = 0
-        while lines[i] != "#Mergesort\n":
+        while lines[i] != "#"+algorithm+"\n":
             i+=1
         for j in range(i + 1, len(lines)):
             s.append(lines[j])
-    return render_template("null.html", code_list = s)
+    return render_template("render_alg.html", code_list = s)
+
+@app.route('/math/<algorithm>')
+def math(algorithm = ""):
+    s = []
+    with open("codes/Math.py") as f:
+        lines = f.readlines()
+        i = 0
+        while lines[i] != "#"+algorithm+"\n":
+            i+=1
+        for j in range(i + 1, len(lines)):
+            s.append(lines[j])
+    return render_template("render_alg.html", code_list = s)
+
+@app.route('/dp/<algorithm>')
+def dp(algorithm = ""):
+    s = []
+    with open("codes/Dynammic Programming.py") as f:
+        lines = f.readlines()
+        i = 0
+        while lines[i] != "#"+algorithm+"\n":
+            i+=1
+        for j in range(i + 1, len(lines)):
+            s.append(lines[j])
+    return render_template("render_alg.html", code_list = s)
+
+@app.route('/graph/<algorithm>')
+def graphs(algorithm = ""):
+    s = []
+    with open("codes/Graph.py") as f:
+        lines = f.readlines()
+        i = 0
+        while lines[i] != "#"+algorithm+"\n":
+            i+=1
+        for j in range(i + 1, len(lines)):
+            s.append(lines[j])
+    return render_template("render_alg.html", code_list = s)
+
+
+@app.route('/community/<algorithm>')
+def community(algorithm = ""):
+    s = []
+    with open("codes/Community.py") as f:
+        lines = f.readlines()
+        i = 0
+        while lines[i] != "#"+algorithm+"\n":
+            i+=1
+        for j in range(i + 1, len(lines)):
+            s.append(lines[j])
+    return render_template("render_alg.html", code_list = s)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
