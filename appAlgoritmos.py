@@ -135,6 +135,7 @@ class Algoritmos:
     def Acceso(self):
         # Esta función lo que hará es que la pestaña de categoría seleccionada se quede selecionada
         #y se deseleccione la anterior
+
         def leavePressed( button):
 
             if (self.sunkenButtn != None):
@@ -159,10 +160,10 @@ class Algoritmos:
         self.GraphButn = Button(self.frame, text="Graphs")
         self.GraphButn.configure(command=lambda:leavePressed(self.GraphButn))
         self.GraphButn.grid(row=0, column=2,sticky = E+W)
-        self.DynamicButn = Button(self.frame, text="Dinamic Programming" )
+        self.DynamicButn = Button(self.frame, text="Dynamic Programming" )
         self.DynamicButn.configure(command=lambda:leavePressed(self.DynamicButn))
         self.DynamicButn.grid(row=0, column=3,sticky = E+W)
-        self.HocButn = Button(self.frame, text="Ad Hoc")
+        self.HocButn = Button(self.frame, text="Others")
         self.HocButn.configure(command=lambda:leavePressed(self.HocButn))
         self.HocButn.grid(row=0, column=4,sticky = E+W)
         self.cuadroParaTabla = Frame(self.frame,height =20)
@@ -172,6 +173,8 @@ class Algoritmos:
         self.contentTable.heading('autor', text='Autor')
         self.contentTable.heading('lenguaje', text='Lenguaje')
         self.contentTable.pack(side = LEFT)
-        self.scrollBar = Scrollbar(self.cuadroParaTabla, orient=VERTICAL)
-        self.scrollBar.pack(side=RIGHT, fill=Y)
-        self.contentTable.config(yscrollcommand=self.scrollBar.set)
+        self.scrollBarY = Scrollbar(self.cuadroParaTabla, orient=VERTICAL)
+        self.scrollBarY.pack(side=RIGHT, fill=Y)
+        self.scrollBarX = Scrollbar(self.cuadroParaTabla, orient=HORIZONTAL)
+        self.scrollBarX.pack(side=BOTTOM, fill=X)
+        self.contentTable.config(yscrollcommand=self.scrollBarY.set, xscrollcommand =self.scrollBarX.set)
