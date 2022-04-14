@@ -7,6 +7,7 @@ from UserDatabaseAccess import UserDtabaseAccess
 class Algoritmos:
     usuarioAct =[]
     def __init__(self, root):
+
         #variable que se usará para las consultas a la base de datos de los usuarios
         self.dbConsults = UserDtabaseAccess()
         self.ventana = root  # Almacenamos la ventana
@@ -126,6 +127,51 @@ class Algoritmos:
         r1,r2 =self.dbConsults.validarAcceso(self.nombre.get(),self.contrasena.get())
         if (r1):
             self.usuarioAct = r2[0][0]
-            self.mensaje['text'] = 'Usuario y contraseña contraseña correctos.\nBienvenido: {}'.format(self.usuarioAct)
+            self.mensaje.configure(fg='black')
+            self.mensaje['text'] = 'Bienvenido: {}'.format(self.usuarioAct)
+            self.Acceso()
         else:
             self.mensaje['text']='Usuario o contraseña incorrectos'
+    def Acceso(self):
+        # Esta función lo que hará es que la pestaña de categoría seleccionada se quede selecionada
+        #y se deseleccione la anterior
+        def leavePressed( button):
+
+            if (self.sunkenButtn != None):
+                self.sunkenButtn.configure(relief="raised")
+            if(button != self.sunkenButtn):
+                button.configure(relief="sunken")
+            self.sunkenButtn = button
+            self.mensaje =""
+        self.ventana.title("Algorithm App")
+        self.frame.configure(text="Algoritmos")
+        for widget in self.frame.winfo_children():
+            widget.destroy()
+        self.sunkenButtn = None
+        self.frame.grid(row=0, column=0, columnspan=5, pady=20, rowspan=12, padx=10)
+        self.mensaje.grid(row =12, column =1, columnspan = 3)
+        self.mathsButn = Button(self.frame, text = "Maths")
+        self.mathsButn.configure(command = lambda:leavePressed(self.mathsButn))
+        self.mathsButn.grid(row=0, column=0,sticky = E+W)
+        self.sortButn = Button(self.frame, text="Sorting")
+        self.sortButn.configure( command= lambda:leavePressed(self.sortButn))
+        self.sortButn.grid(row=0, column=1,sticky = E+W)
+        self.GraphButn = Button(self.frame, text="Graphs")
+        self.GraphButn.configure(command=lambda:leavePressed(self.GraphButn))
+        self.GraphButn.grid(row=0, column=2,sticky = E+W)
+        self.DynamicButn = Button(self.frame, text="Dinamic Programming" )
+        self.DynamicButn.configure(command=lambda:leavePressed(self.DynamicButn))
+        self.DynamicButn.grid(row=0, column=3,sticky = E+W)
+        self.HocButn = Button(self.frame, text="Ad Hoc")
+        self.HocButn.configure(command=lambda:leavePressed(self.HocButn))
+        self.HocButn.grid(row=0, column=4,sticky = E+W)
+        self.cuadroParaTabla = Frame(self.frame,height =20)
+        self.cuadroParaTabla.grid(row =1, rowspan = 10, columnspan = 5)
+        self.contentTable = ttk.Treeview(self.cuadroParaTabla, columns = ("nombre","autor","lenguaje"), show='headings')
+        self.contentTable.heading('nombre', text ='Nombre')
+        self.contentTable.heading('autor', text='Autor')
+        self.contentTable.heading('lenguaje', text='Lenguaje')
+        self.contentTable.pack(side = LEFT)
+        self.scrollBar = Scrollbar(self.cuadroParaTabla, orient=VERTICAL)
+        self.scrollBar.pack(side=RIGHT, fill=Y)
+        self.contentTable.config(yscrollcommand=self.scrollBar.set)
