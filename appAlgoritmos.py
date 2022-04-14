@@ -1,5 +1,6 @@
 from tkinter import ttk
 from tkinter import *
+
 import re
 import hashlib
 from UserDatabaseAccess import UserDtabaseAccess
@@ -132,6 +133,13 @@ class Algoritmos:
             self.Acceso()
         else:
             self.mensaje['text']='Usuario o contraseña incorrectos'
+
+
+    def addAlg(self):
+        pass
+
+    def editAlg(self):
+        pass
     def Acceso(self):
         # Esta función lo que hará es que la pestaña de categoría seleccionada se quede selecionada
         #y se deseleccione la anterior
@@ -149,8 +157,8 @@ class Algoritmos:
         for widget in self.frame.winfo_children():
             widget.destroy()
         self.sunkenButtn = None
-        self.frame.grid(row=0, column=0, columnspan=5, pady=20, rowspan=12, padx=10)
-        self.mensaje.grid(row =12, column =1, columnspan = 3)
+        self.frame.grid(row=0, column=0, columnspan=5, pady=20, rowspan=13, padx=10)
+        self.mensaje.grid(row =13, column =1, columnspan = 3)
         self.mathsButn = Button(self.frame, text = "Maths")
         self.mathsButn.configure(command = lambda:leavePressed(self.mathsButn))
         self.mathsButn.grid(row=0, column=0,sticky = E+W)
@@ -167,14 +175,19 @@ class Algoritmos:
         self.HocButn.configure(command=lambda:leavePressed(self.HocButn))
         self.HocButn.grid(row=0, column=4,sticky = E+W)
         self.cuadroParaTabla = Frame(self.frame,height =20)
-        self.cuadroParaTabla.grid(row =1, rowspan = 10, columnspan = 5)
+        self.cuadroParaTabla.grid(row =1, rowspan = 11, columnspan = 5)
         self.contentTable = ttk.Treeview(self.cuadroParaTabla, columns = ("nombre","autor","lenguaje"), show='headings')
+        self.contentTable.grid(row =0, rowspan =10,columnspan=5)
         self.contentTable.heading('nombre', text ='Nombre')
         self.contentTable.heading('autor', text='Autor')
         self.contentTable.heading('lenguaje', text='Lenguaje')
         self.contentTable.pack(side = LEFT)
         self.scrollBarY = Scrollbar(self.cuadroParaTabla, orient=VERTICAL)
         self.scrollBarY.pack(side=RIGHT, fill=Y)
-        self.scrollBarX = Scrollbar(self.cuadroParaTabla, orient=HORIZONTAL)
-        self.scrollBarX.pack(side=BOTTOM, fill=X)
-        self.contentTable.config(yscrollcommand=self.scrollBarY.set, xscrollcommand =self.scrollBarX.set)
+        #self.scrollBarX = Scrollbar(self.cuadroParaTabla, orient=HORIZONTAL)
+        #self.scrollBarX.pack(side=BOTTOM, fill=X)
+        self.contentTable.config(yscrollcommand=self.scrollBarY.set )#, xscrollcommand =self.scrollBarX.set
+        self.addButtn = Button(self.frame, text = "Editar",command =self.addAlg)
+        self.addButtn.grid(row =12, column =0,columnspan=3,sticky = E+W)
+        self.editBttn = Button(self.frame, text = "Añadir",command=self.editAlg)
+        self.editBttn.grid(row =12, column =3,columnspan=2,sticky = E+W)
