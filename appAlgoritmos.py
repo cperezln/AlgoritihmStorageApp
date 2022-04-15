@@ -1,6 +1,6 @@
 from tkinter import ttk
 from tkinter import *
-
+from tkinter import filedialog
 import re
 import hashlib
 from UserDatabaseAccess import UserDtabaseAccess
@@ -13,9 +13,9 @@ class Algoritmos:
         self.dbConsults = UserDtabaseAccess()
         self.ventana = root  # Almacenamos la ventana
         self.ventana.wm_iconbitmap('recursos/AppIcon.ico')
-        self.ventana.title("Inicio de sesión")
+        self.ventana.title("Register")
         #Creamos el Labelframe sobre el que introduciremos los elementos para registrar usuarios e iniciar sesion
-        self.frame = LabelFrame(self.ventana, text="Registrarse", font=('Calibri', 16, 'bold'))
+        self.frame = LabelFrame(self.ventana, text="register", font=('Calibri', 16, 'bold'))
         s = ttk.Style()
         s.configure('my.TButton', font=('Calibri', 14, 'bold'))
         self.nombre =[]
@@ -135,9 +135,68 @@ class Algoritmos:
             self.mensaje['text']='Usuario o contraseña incorrectos'
 
 
-    def addAlg(self):
-        pass
 
+    filename =''
+    def addAlg(self):
+        global filename
+        filename =''
+        def browseFiles(label_file_explorer):
+            global filename
+            filename= filedialog.askopenfilename(initialdir="/",
+                                                  title="Select a File",
+                                                  filetypes=(("Python files",
+                                                              "*.py*"),
+                                                             ))
+            # Change label contents
+            label_file_explorer.configure(text="File Opened: " + filename)
+
+
+        #Creación del popup para añadir nuevos algoritnos
+        self.window_add = Toplevel()
+        self.window_add.grab_set()
+        self.window_add.title = "Add Algorithm"
+        self.window_add.resizable(1,1)
+        self.window_add.wm_iconbitmap('recursos/AppIcon.ico')
+
+
+
+        #Contenedor de los elementos de la ventana
+        frame_add = LabelFrame(self.window_add,text ="Add Algorithm",font=('times new roman',16,'bold'))
+        frame_add.grid(row=0, column=0, columnspan=3, pady=20)
+        # Fila nuevo nombre
+        self.new_name_label = Label(frame_add, text="Name", font=('Calibri', 13))
+        self.new_name_label.grid(row=1, column=0)
+        self.new_name = Entry(frame_add, font=('Calibri', 13))
+        self.new_name.grid(row=1, column=1)
+
+        # Fila nuevo precio
+        self.description_label = Label(frame_add, text="Description:", font=('Calibri', 13))
+        self.description_label.grid(row=2, column=0, columnspan = 3)
+        self.description = Text(frame_add, font=('Calibri', 13),height=4)
+        self.description.grid(row=3, column=0,columnspan=3,sticky= E+W)
+
+        # Fila nueva categoria
+        self.program_file_label = Label(frame_add, text="Programn:", font=('Calibri', 13))
+        self.program_file_label.grid(row=5, column=0,columnspan =2,sticky=W)
+        self.programn_select_bttn = Button(frame_add,text="Select a file",command = lambda :browseFiles(self.program_file_label))
+        self.programn_select_bttn.grid(row=5, column=2)
+
+        #Boton para confimar
+        self.confirm_bttn = Button(frame_add, text="Confirm",command =self.storeAlg)
+        self.confirm_bttn.grid(row =6,column = 0,columnspan =3, sticky=E+W)
+        self.mensaje2 = Label(frame_add,text="", fg='red')
+        self.mensaje2.grid(row =7,column = 0, rowspan =3, sticky = E+W)
+
+    def storeAlg(self):
+        if filename != "" and len(self.new_name.get()) != 0:
+            self.storeFile()
+            self.mensaje['text']="Algorith added successfully"
+            self.window_add.grab_release()
+            self.window_add.destroy()
+        else:
+            self.mensaje2["text"]="Add a name and/or select a valid .py file"
+    def storeFile(self):
+        pass
     def editAlg(self):
         pass
     def Acceso(self):
