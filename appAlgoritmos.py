@@ -1,3 +1,4 @@
+import tkinter
 from tkinter import ttk
 from tkinter import *
 from tkinter import filedialog
@@ -18,9 +19,7 @@ class Algoritmos:
         self.frame = LabelFrame(self.ventana, text="register", font=('Calibri', 16, 'bold'))
         s = ttk.Style()
         s.configure('my.TButton', font=('Calibri', 14, 'bold'))
-        self.nombre =[]
-        self.contrasena =[]
-        self.correo =[]
+
         #Finalmente ejecutamos la función que inicializará la pantalla para crear nuevos usuarios
         self.SignUp()
 
@@ -110,9 +109,12 @@ class Algoritmos:
         self.mensaje['text'] = ""
         #Si el controlador nos devuelve alguno de los boolenos negativos, entonces alguo de los campos es incorrecto y lo indicamos en
         #el elemento de los errores
+        if (b1 and b2 and b3 and b4 and not b5 and b6):
+            self.dbConsults.insertarUsuario((self.nombre.get(),self.contrasena.get(),self.correo.get()))
+            self.InicioSesion()
         if (not b3):
             self.mensaje['text'] += "El nombre es obligatorio\n"
-        if(not b5):
+        if( b5):
             self.mensaje['text'] += "El nombre introducido ya pertenece a un usuario\n"
         if (not b4):
             self.mensaje['text'] += "La contraseña  debe tener un tamaño superior a los 9 caracteres\n"
@@ -128,6 +130,13 @@ class Algoritmos:
         r1,r2 =self.dbConsults.validarAcceso(self.nombre.get(),self.contrasena.get())
         if (r1):
             self.usuarioAct = r2[0][0]
+            delattr(self,"nombre")
+            delattr(self,"contrasena")
+            delattr(self, "correo")
+            for widget in self.frame.winfo_children():
+                widget.destroy()
+            self.mensaje = Label(text="", fg='red')
+            self.mensaje.grid(row=4, column=0, columnspan=6, sticky=W + E)
             self.mensaje.configure(fg='black')
             self.mensaje['text'] = 'Bienvenido: {}'.format(self.usuarioAct)
             self.Acceso()
@@ -142,13 +151,16 @@ class Algoritmos:
         filename =''
         def browseFiles(label_file_explorer):
             global filename
-            filename= filedialog.askopenfilename(initialdir="/",
+            filenameaux= filedialog.askopenfilename(initialdir="/",
                                                   title="Select a File",
                                                   filetypes=(("Python files",
-                                                              "*.py*"),
-                                                             ))
-            # Change label contents
-            label_file_explorer.configure(text="File Opened: " + filename)
+                                                              "*.py*"),))
+            if (filenameaux != ""):
+                file = re.findall('/[^/]+\.py',filenameaux)[0]
+                label_file_explorer.configure(text="File Opened: "+file )
+                filename = filenameaux
+
+
 
 
         #Creación del popup para añadir nuevos algoritnos
@@ -164,40 +176,87 @@ class Algoritmos:
         frame_add = LabelFrame(self.window_add,text ="Add Algorithm",font=('times new roman',16,'bold'))
         frame_add.grid(row=0, column=0, columnspan=3, pady=20)
         # Fila nuevo nombre
-        self.new_name_label = Label(frame_add, text="Name", font=('Calibri', 13))
-        self.new_name_label.grid(row=1, column=0)
-        self.new_name = Entry(frame_add, font=('Calibri', 13))
-        self.new_name.grid(row=1, column=1)
-
-        # Fila nuevo precio
-        self.description_label = Label(frame_add, text="Description:", font=('Calibri', 13))
-        self.description_label.grid(row=2, column=0, columnspan = 3)
+        alg_name_label = Label(frame_add, text=" Name : ", font=('Calibri', 20))
+        alg_name_label.grid(row=1, column=0,sticky=E+W+N+S)
+        self.alg_name = Text(frame_add, font=('Calibri', 13),height=1,width =50)
+        self.alg_name.grid(row=1, column=1)
+        public_private_container = LabelFrame(frame_add,text ="Visibility")
+        public_private_container.grid(row=1, column =2)
+        self.rad_value =tkinter.IntVar()
+        rad_bttn1= tkinter.Radiobutton(public_private_container,text = 'public',variable = self.rad_value,value =1)
+        rad_bttn1.pack(side= TOP)
+        rad_bttn2 = tkinter.Radiobutton(public_private_container, text='private', variable=self.rad_value, value=2)
+        rad_bttn2.pack(side=BOTTOM)
+        # Filas para la descripcion
+        description_label = Label(frame_add, text="Description:", font=('Calibri', 13))
+        description_label.grid(row=2, column=0, columnspan = 3)
         self.description = Text(frame_add, font=('Calibri', 13),height=4)
         self.description.grid(row=3, column=0,columnspan=3,sticky= E+W)
 
-        # Fila nueva categoria
-        self.program_file_label = Label(frame_add, text="Programn:", font=('Calibri', 13))
-        self.program_file_label.grid(row=5, column=0,columnspan =2,sticky=W)
-        self.programn_select_bttn = Button(frame_add,text="Select a file",command = lambda :browseFiles(self.program_file_label))
-        self.programn_select_bttn.grid(row=5, column=2)
+        # Fila seleccion dxe programa de momento solo admite .py
+        program_file_label = Label(frame_add, text="Programn:", font=('Calibri', 13))
+        program_file_label.grid(row=5, column=0,columnspan =2,sticky=W)
+        self.image = PhotoImage(file='recursos/folder.png')
 
+
+        programn_select_bttn = Button(frame_add,image=self.image,command = lambda :browseFiles(program_file_label))
+        programn_select_bttn.grid(row=5, column=2)
+
+        #Fila seleccion categoria
+        category_label = Label(frame_add, text="Category:", font=('Calibri', 13))
+        category_label.grid(row =6, column=0)
+        self.category_bttn = ttk.Combobox(frame_add,state="readonly",values=["Math", "Sorting", "Graph", "Dynammic Programming"])
+        self.category_bttn.grid(row =6, column =1, columnspan = 2)
         #Boton para confimar
         self.confirm_bttn = Button(frame_add, text="Confirm",command =self.storeAlg)
-        self.confirm_bttn.grid(row =6,column = 0,columnspan =3, sticky=E+W)
+        self.confirm_bttn.grid(row =7,column = 0,columnspan =3 ,sticky=E+W)
         self.mensaje2 = Label(frame_add,text="", fg='red')
-        self.mensaje2.grid(row =7,column = 0, rowspan =3, sticky = E+W)
+        self.mensaje2.grid(row =8,column = 0, columnspan =3, sticky = E+W)
 
     def storeAlg(self):
-        if filename != "" and len(self.new_name.get()) != 0:
-            self.storeFile()
-            self.mensaje['text']="Algorith added successfully"
+        self.mensaje2["text"]=""
+        alg_name = self.alg_name.get("1.0",END).replace("\r","").replace("\n"," ")
+        if (len(alg_name) < 2):
+            self.mensaje2["text"] += "Add a name "
+        if (not (self.rad_value.get() == 1 or self.rad_value.get() == 2)):
+            self.mensaje2["text"] += " select a visibility option "
+        if (filename == ""):
+            self.mensaje2["text"] += " select a .py file"
+        if (len(self.category_bttn.get())==0):
+            self.mensaje2["text"] += " select a category"
+        if filename != "" and len(alg_name) != 0 and (self.rad_value.get()==1 or self.rad_value.get()==2) and len(self.category_bttn.get())>0:
+
+            self.storeFile(filename, alg_name,self.rad_value.get(),self.description.get("1.0",END),self.category_bttn.get())
+            self.mensaje['text'] = "Algorith added successfully"
             self.window_add.grab_release()
             self.window_add.destroy()
-        else:
-            self.mensaje2["text"]="Add a name and/or select a valid .py file"
-    def storeFile(self):
-        pass
-    def editAlg(self):
+            delattr(self,"window_add")
+            delattr(self, "mensaje2")
+            delattr(self, "confirm_bttn")
+            delattr(self, "description")
+            delattr(self, "rad_value")
+            delattr(self, "alg_name")
+            delattr(self, "image")
+            delattr(self, "category_bttn")
+            print(self.__dict__)
+
+
+    def storeFile(self,file,alg_name,visibility, des,cat):
+        with  open('codes/{}-local.py'.format(cat),'a') as e:
+            e.write("#Author:"+self.usuarioAct+"\n")
+            e.write("#"+alg_name+"\n")
+            if (visibility ==1):
+                e.write("#public\n")
+            else:
+                e.write("#private\n")
+            e.write('"""\n{}"""\n'.format(des))
+            with open(file,"r") as e2:
+                e.write(e2.read())
+        if visibility == 1:
+            pass
+
+
+    def DeleteAlg(self):
         pass
     def Acceso(self):
         # Esta función lo que hará es que la pestaña de categoría seleccionada se quede selecionada
@@ -207,10 +266,15 @@ class Algoritmos:
 
             if (self.sunkenButtn != None):
                 self.sunkenButtn.configure(relief="raised")
+
             if(button != self.sunkenButtn):
                 button.configure(relief="sunken")
-            self.sunkenButtn = button
-            self.mensaje =""
+                self.sunkenButtn = button
+            else:
+                self.sunkenButtn.configure(relief="raised")
+                self.sunkenButtn = None
+
+            self.mensaje['text'] =""
         self.ventana.title("Algorithm App")
         self.frame.configure(text="Algoritmos")
         for widget in self.frame.winfo_children():
@@ -235,18 +299,18 @@ class Algoritmos:
         self.HocButn.grid(row=0, column=4,sticky = E+W)
         self.cuadroParaTabla = Frame(self.frame,height =20)
         self.cuadroParaTabla.grid(row =1, rowspan = 11, columnspan = 5)
-        self.contentTable = ttk.Treeview(self.cuadroParaTabla, columns = ("nombre","autor","lenguaje"), show='headings')
+        self.contentTable = ttk.Treeview(self.cuadroParaTabla, columns = ("nombre","autor","visibility"), show='headings')
         self.contentTable.grid(row =0, rowspan =10,columnspan=5)
-        self.contentTable.heading('nombre', text ='Nombre')
-        self.contentTable.heading('autor', text='Autor')
-        self.contentTable.heading('lenguaje', text='Lenguaje')
+        self.contentTable.heading('nombre', text ='Name')
+        self.contentTable.heading('autor', text='Author')
+        self.contentTable.heading('visibility', text='Visibility')
         self.contentTable.pack(side = LEFT)
         self.scrollBarY = Scrollbar(self.cuadroParaTabla, orient=VERTICAL)
         self.scrollBarY.pack(side=RIGHT, fill=Y)
         #self.scrollBarX = Scrollbar(self.cuadroParaTabla, orient=HORIZONTAL)
         #self.scrollBarX.pack(side=BOTTOM, fill=X)
         self.contentTable.config(yscrollcommand=self.scrollBarY.set )#, xscrollcommand =self.scrollBarX.set
-        self.addButtn = Button(self.frame, text = "Editar",command =self.addAlg)
+        self.addButtn = Button(self.frame, text = "Add",command =self.addAlg)
         self.addButtn.grid(row =12, column =0,columnspan=3,sticky = E+W)
-        self.editBttn = Button(self.frame, text = "Añadir",command=self.editAlg)
-        self.editBttn.grid(row =12, column =3,columnspan=2,sticky = E+W)
+        self.deleteBttn = Button(self.frame, text = "Delete",command=self.DeleteAlg)
+        self.deleteBttn.grid(row =12, column =3,columnspan=2,sticky = E+W)
