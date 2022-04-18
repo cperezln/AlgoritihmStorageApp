@@ -130,18 +130,45 @@ class Algoritmos:
         r1,r2 =self.dbConsults.validarAcceso(self.nombre.get(),self.contrasena.get())
         if (r1):
             self.usuarioAct = r2[0][0]
-            delattr(self,"nombre")
-            delattr(self,"contrasena")
-            delattr(self, "correo")
+
             for widget in self.frame.winfo_children():
                 widget.destroy()
-            self.mensaje = Label(text="", fg='red')
-            self.mensaje.grid(row=4, column=0, columnspan=6, sticky=W + E)
-            self.mensaje.configure(fg='black')
+            delattr(self, "nombre")
+            delattr(self, "contrasena")
+            delattr(self, "correo")
+            self.mensaje = Label(text="", fg='black')
             self.mensaje['text'] = 'Bienvenido: {}'.format(self.usuarioAct)
             self.Acceso()
         else:
             self.mensaje['text']='Usuario o contraseña incorrectos'
+
+
+    def retriveAlg(self,bttn_name):
+        for fila in self.contentTable.get_children():
+            self.tabla.delete(fila)
+        if bttn_name != "Community" and bttn_name !="":
+            with  open('codes/{}-local.py'.format(bttn_name), 'r') as e:
+                alg =e.read()
+                alg = alg.split("#Autor")[1:]
+
+                for string in alg :
+                    aux = string.split("##")
+
+                    if (self.usuarioAct == aux[1]  ):
+                        aux2 = aux[3].split("'''")
+                        print(aux2)
+                        id =self.contentTable.insert('', 0, values=(aux[3].replace("\n",""),aux[2].replace("\n",""), aux2[0].replace("\n","")))
+                        self.contentTable.insert(id,0,text=aux2[1])
+                        self.contentTable.insert(id, 1, text=aux2[2])
+                    if ("Admin" == aux[1]):
+                        aux2 = aux[2].split("'''")
+                        print(aux2)
+                        id = self.contentTable.insert('', 0,  values=(aux2[0],aux[2], "public"))
+                        self.contentTable.insert(id, 0, text=aux2[1])
+                        self.contentTable.insert(id, 1, text=aux2[2])
+        else:
+            pass
+
 
 
 
@@ -243,13 +270,13 @@ class Algoritmos:
 
     def storeFile(self,file,alg_name,visibility, des,cat):
         with  open('codes/{}-local.py'.format(cat),'a') as e:
-            e.write("#Author:"+self.usuarioAct+"\n")
-            e.write("#"+alg_name+"\n")
+            e.write("#Autor##"+self.usuarioAct+"\n")
+            e.write("##"+alg_name+"\n")
             if (visibility ==1):
-                e.write("#public\n")
+                e.write("##public\n")
             else:
-                e.write("#private\n")
-            e.write('"""\n{}"""\n'.format(des))
+                e.write("##private\n")
+            e.write("'''\n{}'''\n".format(des))
             with open(file,"r") as e2:
                 e.write(e2.read())
         if visibility == 1:
@@ -270,36 +297,39 @@ class Algoritmos:
             if(button != self.sunkenButtn):
                 button.configure(relief="sunken")
                 self.sunkenButtn = button
+                self.retriveAlg(self.sunkenButtn['text'])
             else:
                 self.sunkenButtn.configure(relief="raised")
                 self.sunkenButtn = None
+                self.retriveAlg('')
 
             self.mensaje['text'] =""
         self.ventana.title("Algorithm App")
         self.frame.configure(text="Algoritmos")
         for widget in self.frame.winfo_children():
             widget.destroy()
-        self.sunkenButtn = None
+
         self.frame.grid(row=0, column=0, columnspan=5, pady=20, rowspan=13, padx=10)
         self.mensaje.grid(row =13, column =1, columnspan = 3)
-        self.mathsButn = Button(self.frame, text = "Maths")
-        self.mathsButn.configure(command = lambda:leavePressed(self.mathsButn))
+        self.mathsButn = Button(self.frame, text = "Math")
+        self.mathsButn.configure(command = lambda:leavePressed(self.mathsButn),relief="sunken")
         self.mathsButn.grid(row=0, column=0,sticky = E+W)
         self.sortButn = Button(self.frame, text="Sorting")
         self.sortButn.configure( command= lambda:leavePressed(self.sortButn))
         self.sortButn.grid(row=0, column=1,sticky = E+W)
-        self.GraphButn = Button(self.frame, text="Graphs")
+        self.GraphButn = Button(self.frame, text="Graph")
         self.GraphButn.configure(command=lambda:leavePressed(self.GraphButn))
         self.GraphButn.grid(row=0, column=2,sticky = E+W)
-        self.DynamicButn = Button(self.frame, text="Dynamic Programming" )
+        self.DynamicButn = Button(self.frame, text="Dynammic Programming" )
         self.DynamicButn.configure(command=lambda:leavePressed(self.DynamicButn))
         self.DynamicButn.grid(row=0, column=3,sticky = E+W)
-        self.HocButn = Button(self.frame, text="Others")
-        self.HocButn.configure(command=lambda:leavePressed(self.HocButn))
-        self.HocButn.grid(row=0, column=4,sticky = E+W)
+        self.CommunityButn = Button(self.frame, text="Community")
+        self.CommunityButn.configure(command=lambda:leavePressed(self.CommunityButn))
+        self.sunkenButtn = self.mathsButn
+        self.CommunityButn.grid(row=0, column=4,sticky = E+W)
         self.cuadroParaTabla = Frame(self.frame,height =20)
         self.cuadroParaTabla.grid(row =1, rowspan = 11, columnspan = 5)
-        self.contentTable = ttk.Treeview(self.cuadroParaTabla, columns = ("nombre","autor","visibility"), show='headings')
+        self.contentTable = ttk.Treeview(self.cuadroParaTabla, columns = ("nombre","autor","visibility"))
         self.contentTable.grid(row =0, rowspan =10,columnspan=5)
         self.contentTable.heading('nombre', text ='Name')
         self.contentTable.heading('autor', text='Author')
@@ -314,3 +344,5 @@ class Algoritmos:
         self.addButtn.grid(row =12, column =0,columnspan=3,sticky = E+W)
         self.deleteBttn = Button(self.frame, text = "Delete",command=self.DeleteAlg)
         self.deleteBttn.grid(row =12, column =3,columnspan=2,sticky = E+W)
+
+        self.retriveAlg(self.sunkenButtn['text'])
