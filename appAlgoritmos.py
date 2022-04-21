@@ -4,14 +4,14 @@ from tkinter import *
 from tkinter import filedialog
 import re
 import hashlib
-from UserDatabaseAccess import UserDtabaseAccess
+from UserDatabaseAccess import UserDatabaseAccess
 
 class Algoritmos:
     usuarioAct =[]
     def __init__(self, root):
 
         #variable que se usará para las consultas a la base de datos de los usuarios
-        self.dbConsults = UserDtabaseAccess()
+        self.dbConsults = UserDatabaseAccess()
         self.ventana = root  # Almacenamos la ventana
         self.ventana.wm_iconbitmap('recursos/AppIcon.ico')
         self.ventana.title("Register")
@@ -63,7 +63,7 @@ class Algoritmos:
 
         #Zona donde se mostrarán los errores en los datos introducidos
 
-        self.mensaje = Label(text="", fg='red')
+        self.mensaje = Label(self.frame,text="", fg='red')
         self.mensaje.grid(row=5, column=0, columnspan=6, sticky=W + E)
 
     #función que inicializa los elementos del Labelframe para el login de los usuarios
@@ -99,7 +99,7 @@ class Algoritmos:
 
        #Compartimento en el que se indicara si el usuario con la contraseña introducido se encuntra en la base de datos
 
-        self.mensaje = Label(text="", fg='red')
+        self.mensaje = Label(self.frame,text="", fg='red')
         self.mensaje.grid(row=4, column=0, columnspan=6, sticky=W + E)
     #Función que registra al usuario si todos los campos están rellenos y ni el nombre ni el correo coincide con ningún usuario ya registrado
     def registrarse(self):
@@ -135,35 +135,41 @@ class Algoritmos:
                 widget.destroy()
             delattr(self, "nombre")
             delattr(self, "contrasena")
-            delattr(self, "correo")
-            self.mensaje = Label(text="", fg='black')
-            self.mensaje['text'] = 'Bienvenido: {}'.format(self.usuarioAct)
+            try:
+                delattr(self, "correo")
+            except( Exception ):
+                pass
+
             self.Acceso()
         else:
             self.mensaje['text']='Usuario o contraseña incorrectos'
 
 
     def retriveAlg(self,bttn_name):
+        print(bttn_name)
         for fila in self.contentTable.get_children():
             self.tabla.delete(fila)
         if bttn_name != "Community" and bttn_name !="":
             with  open('codes/{}-local.py'.format(bttn_name), 'r') as e:
+                print("a")
                 alg =e.read()
                 alg = alg.split("#Autor")[1:]
 
                 for string in alg :
                     aux = string.split("##")
 
-                    if (self.usuarioAct == aux[1]  ):
+                    if (self.usuarioAct == aux[1].replace('\n','')  ):
                         aux2 = aux[3].split("'''")
                         print(aux2)
-                        id =self.contentTable.insert('', 0, values=(aux[3].replace("\n",""),aux[2].replace("\n",""), aux2[0].replace("\n","")))
+                        id =self.contentTable.insert('', 0, values=(aux[2].replace("\n",""),aux[1].replace("\n",""), aux2[0].replace("\n","")))
+
                         self.contentTable.insert(id,0,text=aux2[1])
-                        self.contentTable.insert(id, 1, text=aux2[2])
-                    if ("Admin" == aux[1]):
+                        self.contentTable.insert(id, 1,text=aux2[2])
+                    if ("Admin" == aux[1].replace('\n','')):
+
                         aux2 = aux[2].split("'''")
+                        id = self.contentTable.insert('', 0,  values=(aux2[0],aux[1], "public"))
                         print(aux2)
-                        id = self.contentTable.insert('', 0,  values=(aux2[0],aux[2], "public"))
                         self.contentTable.insert(id, 0, text=aux2[1])
                         self.contentTable.insert(id, 1, text=aux2[2])
         else:
@@ -303,13 +309,14 @@ class Algoritmos:
                 self.sunkenButtn = None
                 self.retriveAlg('')
 
-            self.mensaje['text'] =""
+
         self.ventana.title("Algorithm App")
         self.frame.configure(text="Algoritmos")
         for widget in self.frame.winfo_children():
             widget.destroy()
 
         self.frame.grid(row=0, column=0, columnspan=5, pady=20, rowspan=13, padx=10)
+        self.mensaje =Label(self.frame, text="", fg='red')
         self.mensaje.grid(row =13, column =1, columnspan = 3)
         self.mathsButn = Button(self.frame, text = "Math")
         self.mathsButn.configure(command = lambda:leavePressed(self.mathsButn),relief="sunken")
@@ -340,9 +347,9 @@ class Algoritmos:
         #self.scrollBarX = Scrollbar(self.cuadroParaTabla, orient=HORIZONTAL)
         #self.scrollBarX.pack(side=BOTTOM, fill=X)
         self.contentTable.config(yscrollcommand=self.scrollBarY.set )#, xscrollcommand =self.scrollBarX.set
+        self.retriveAlg(self.sunkenButtn['text'])
         self.addButtn = Button(self.frame, text = "Add",command =self.addAlg)
         self.addButtn.grid(row =12, column =0,columnspan=3,sticky = E+W)
         self.deleteBttn = Button(self.frame, text = "Delete",command=self.DeleteAlg)
         self.deleteBttn.grid(row =12, column =3,columnspan=2,sticky = E+W)
 
-        self.retriveAlg(self.sunkenButtn['text'])
