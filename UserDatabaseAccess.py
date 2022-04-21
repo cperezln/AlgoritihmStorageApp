@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 import re
 import hashlib
-class UserDtabaseAccess:
+class UserDatabaseAccess:
     def __init__(self):
         # Aqui declaramos el motor para conectarnos a la base de datos aunque de momento no nos conectamos eso se hará en la función db_consulta
         db = 'sqlite:///database/usuarios.db'

@@ -1,13 +1,24 @@
-import UserDatabaseAccess
+import UserDatabaseAccess as db
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
-
+db = db.UserDatabaseAccess()
 @app.route('/')
+def main():
+    return render_template("login.html", error = "")
+@app.route('/login',  methods = ['GET', 'POST'])
 def login():
-    return render_template("login.html")
-
-@app.route('/index')
+    if[request.method == 'POST']:
+        if request.form['action'] == 'login':
+            req = request.form
+            print(req.get('email'), req.get('pass'))
+            if(db.validarAcceso(req.get('email'), req.get('pass'))):
+                return redirect('/index')
+            else:
+                return render_template("login.html", error = "User not found")
+        elif request.form['action'] == 'register':
+            pass
+@app.route('/index', methods = ['GET', 'POST'])
 def home():
     return render_template("index.html")
 
