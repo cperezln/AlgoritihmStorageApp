@@ -5,7 +5,7 @@ from tkinter import filedialog
 import re
 import hashlib
 from UserDatabaseAccess import UserDatabaseAccess
-
+import requests
 class Algoritmos:
     usuarioAct =[]
     SavedAlg = []
@@ -128,7 +128,8 @@ class Algoritmos:
     #Función que comprueba que el usuario esta registrado he inicia sesión con dicho usuario si es el caso
     def InicioSesion(self):
         self.mensaje['text']=''
-        r1,r2 =self.dbConsults.validarAcceso(self.nombre.get(),self.contrasena.get())
+        r1=requests.post('http://127.0.0.1/',json=[self.nombre.get(),self.contrasena.get()])
+
         if (r1):
             self.usuarioAct = r2[0][0]
 

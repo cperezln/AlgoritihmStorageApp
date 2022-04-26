@@ -32,11 +32,14 @@ class UserDatabaseAccess:
         print(self.db_consulta(query2))
         return(aux[0],aux[1],self.validacion_nombre(name),self.validacion_contrasena(password),len(self.db_consulta(query1 ))!=0,len(self.db_consulta(query2))==0)
 
-    def validarAcceso(self,usuario,con):
+    def validarAcceso(self,text,con):
         contrasena =  hash_sha3_224 = hashlib.new("sha3_224", con.encode())
-        parametros =(usuario,hash_sha3_224.hexdigest())
+        parametros =(text,hash_sha3_224.hexdigest())
         query = 'SELECT nombre,correo FROM usuarios WHERE nombre = "{}" and contrasena ="{}"'.format(parametros[0],parametros[1])
         resul = self.db_consulta(query)
+        if(resul == []):
+            query = 'SELECT nombre,correo FROM usuarios WHERE correo = "{}" and contrasena ="{}"'.format(parametros[0], parametros[1])
+            resul = self.db_consulta(query)
         return ( resul != [], resul)
 
     def db_consulta(self, consulta, parametros=()):
