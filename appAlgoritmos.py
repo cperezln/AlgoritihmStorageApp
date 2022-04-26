@@ -128,10 +128,11 @@ class Algoritmos:
     #Función que comprueba que el usuario esta registrado he inicia sesión con dicho usuario si es el caso
     def InicioSesion(self):
         self.mensaje['text']=''
-        r1=requests.post('http://127.0.0.1:8080',json=[self.nombre.get(),self.contrasena.get()])
-
-        if (r1):
-            self.usuarioAct = r2[0][0]
+        r1=requests.get('http://127.0.0.1:5000/local',json=[self.nombre.get(),self.contrasena.get()])
+        r = r1.text
+        print(r)
+        if (r[0]):
+            self.usuarioAct = r[0][0]
 
             for widget in self.frame.winfo_children():
                 widget.destroy()

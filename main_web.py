@@ -90,6 +90,7 @@ def checkAccessDatabase(user, con):
 @app.route('/local')
 def login_local():
     content = request.json
+    print(content,checkAccessDatabase(content[0], content[1]) )
     return checkAccessDatabase(content[0], content[1])
 
 if __name__ == '__main__':
