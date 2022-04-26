@@ -1,6 +1,6 @@
 import UserDatabaseAccess as db
-from flask import Flask, render_template, request, redirect, url_for
-
+from flask import Flask, render_template, request, redirect, url_for, Response
+import json
 app = Flask(__name__)
 db = db.UserDatabaseAccess()
 @app.route('/')
@@ -90,8 +90,9 @@ def checkAccessDatabase(user, con):
 @app.route('/local')
 def login_local():
     content = request.json
-    print(content,checkAccessDatabase(content[0], content[1]) )
-    return checkAccessDatabase(content[0], content[1])
+    result =checkAccessDatabase(content[0], content[1])
+    print(result )
+    return  Response(json.dumps({'b1':result[0], 'res': list(result[1][0])}))
 
 if __name__ == '__main__':
     app.run(debug=True)

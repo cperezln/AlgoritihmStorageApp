@@ -40,7 +40,7 @@ class UserDatabaseAccess:
         if(resul == []):
             query = 'SELECT nombre,correo FROM usuarios WHERE correo = "{}" and contrasena ="{}"'.format(parametros[0], parametros[1])
             resul = self.db_consulta(query)
-        return ( resul != [], resul)
+        return ( [resul != [], resul])
 
     def db_consulta(self, consulta, parametros=()):
         with self.engine.connect() as con:
