@@ -8,6 +8,7 @@ from UserDatabaseAccess import UserDatabaseAccess
 
 class Algoritmos:
     usuarioAct =[]
+    SavedAlg = []
     def __init__(self, root):
 
         #variable que se usará para las consultas a la base de datos de los usuarios
@@ -148,10 +149,10 @@ class Algoritmos:
     def retriveAlg(self,bttn_name):
         print(bttn_name)
         for fila in self.contentTable.get_children():
-            self.tabla.delete(fila)
+            self.contentTable.delete(fila)
         if bttn_name != "Community" and bttn_name !="":
             with  open('codes/{}-local.py'.format(bttn_name), 'r') as e:
-                print("a")
+                i =0
                 alg =e.read()
                 alg = alg.split("#Autor")[1:]
 
@@ -161,17 +162,18 @@ class Algoritmos:
                     if (self.usuarioAct == aux[1].replace('\n','')  ):
                         aux2 = aux[3].split("'''")
                         print(aux2)
-                        id =self.contentTable.insert('', 0, values=(aux[2].replace("\n",""),aux[1].replace("\n",""), aux2[0].replace("\n","")))
-
-                        self.contentTable.insert(id,0,text=aux2[1])
-                        self.contentTable.insert(id, 1,text=aux2[2])
+                        self.contentTable.insert('', 0,iid =i ,values=(aux[2].replace("\n",""),aux[1].replace("\n",""), aux2[0].replace("\n","")))
+                        i+=1
+                        self.SavedAlg.append([aux[2].replace("\n",""),aux2[1],aux2[2]])
+                        #self.contentTable.insert(id,0,text=aux2[1])
+                        #self.contentTable.insert(id, 1,text=aux2[2])
                     if ("Admin" == aux[1].replace('\n','')):
 
                         aux2 = aux[2].split("'''")
-                        id = self.contentTable.insert('', 0,  values=(aux2[0],aux[1], "public"))
-                        print(aux2)
-                        self.contentTable.insert(id, 0, text=aux2[1])
-                        self.contentTable.insert(id, 1, text=aux2[2])
+                        self.contentTable.insert('', 0,iid =i,  values=(aux2[0].replace("\n",""),aux[1].replace("\n",""), "public"))
+                        i += 1
+                        self.SavedAlg.append([aux2[0].replace("\n",""),aux2[1], aux2[2]])
+
         else:
             pass
 
@@ -272,7 +274,18 @@ class Algoritmos:
             delattr(self, "image")
             delattr(self, "category_bttn")
             print(self.__dict__)
+            self.SavedAlg = []
+            self.retriveAlg(self.sunkenButtn['text'])
+    def OnClick(self,event):
+        item = self.contentTable.identify('item', event.x, event.y)
 
+        if (item):
+            self.showAlg['text'] = self.SavedAlg[int(item)][0]
+            self.Alg.configure(state='normal')
+            self.Alg.delete('1.0', END)
+            self.Alg.insert('1.0',self.SavedAlg[int(item)][1]+self.SavedAlg[int(item)][2])
+            self.Alg.configure(state='disabled')
+            print("you clicked on",item )
 
     def storeFile(self,file,alg_name,visibility, des,cat):
         with  open('codes/{}-local.py'.format(cat),'a') as e:
@@ -288,7 +301,6 @@ class Algoritmos:
         if visibility == 1:
             pass
 
-
     def DeleteAlg(self):
         pass
     def Acceso(self):
@@ -299,7 +311,7 @@ class Algoritmos:
 
             if (self.sunkenButtn != None):
                 self.sunkenButtn.configure(relief="raised")
-
+            self.SavedAlg = []
             if(button != self.sunkenButtn):
                 button.configure(relief="sunken")
                 self.sunkenButtn = button
@@ -309,15 +321,14 @@ class Algoritmos:
                 self.sunkenButtn = None
                 self.retriveAlg('')
 
-
         self.ventana.title("Algorithm App")
         self.frame.configure(text="Algoritmos")
         for widget in self.frame.winfo_children():
             widget.destroy()
 
-        self.frame.grid(row=0, column=0, columnspan=5, pady=20, rowspan=13, padx=10)
+        self.frame.grid(row=0, column=0, columnspan=6, pady=20, rowspan=14, padx=10)
         self.mensaje =Label(self.frame, text="", fg='red')
-        self.mensaje.grid(row =13, column =1, columnspan = 3)
+        self.mensaje.grid(row =13, column =1, columnspan = 9)
         self.mathsButn = Button(self.frame, text = "Math")
         self.mathsButn.configure(command = lambda:leavePressed(self.mathsButn),relief="sunken")
         self.mathsButn.grid(row=0, column=0,sticky = E+W)
@@ -334,22 +345,34 @@ class Algoritmos:
         self.CommunityButn.configure(command=lambda:leavePressed(self.CommunityButn))
         self.sunkenButtn = self.mathsButn
         self.CommunityButn.grid(row=0, column=4,sticky = E+W)
-        self.cuadroParaTabla = Frame(self.frame,height =20)
-        self.cuadroParaTabla.grid(row =1, rowspan = 11, columnspan = 5)
-        self.contentTable = ttk.Treeview(self.cuadroParaTabla, columns = ("nombre","autor","visibility"))
-        self.contentTable.grid(row =0, rowspan =10,columnspan=5)
+        self.cuadroParaTabla = Frame(self.frame,height =13)
+        self.cuadroParaTabla.grid(row =1, rowspan = 13, columnspan = 5)
+        self.contentTable = ttk.Treeview(self.cuadroParaTabla, columns = ("nombre","autor","visibility"),show='headings')
+        self.contentTable.grid(row =1, rowspan =13,columnspan=5)
         self.contentTable.heading('nombre', text ='Name')
         self.contentTable.heading('autor', text='Author')
         self.contentTable.heading('visibility', text='Visibility')
         self.contentTable.pack(side = LEFT)
-        self.scrollBarY = Scrollbar(self.cuadroParaTabla, orient=VERTICAL)
+        self.contentTable.bind("<1>", self.OnClick)
+        self.scrollBarY = Scrollbar(self.cuadroParaTabla, orient=VERTICAL,command=self.contentTable.yview)
         self.scrollBarY.pack(side=RIGHT, fill=Y)
-        #self.scrollBarX = Scrollbar(self.cuadroParaTabla, orient=HORIZONTAL)
-        #self.scrollBarX.pack(side=BOTTOM, fill=X)
-        self.contentTable.config(yscrollcommand=self.scrollBarY.set )#, xscrollcommand =self.scrollBarX.set
+
+        self.contentTable.config(yscrollcommand=self.scrollBarY.set )
+        #Frame que nos permitirá mostrar los algoritmos
+
+        self.showAlg = LabelFrame(self.frame,text ="",font=('times new roman',16,'bold'))
+        self.showAlg.grid(row =0, rowspan = 13, column =5 )
+        self.Alg = Text(self.showAlg,state =DISABLED,width=40,height=20,wrap =NONE)
+
+
+        self.scrollBarAlgY = Scrollbar(self.showAlg, orient=VERTICAL,command=self.Alg.yview)
+        self.scrollBarAlgY.pack(side=RIGHT, fill=Y)
+        self.scrollBarAlgX =Scrollbar(self.showAlg, orient=HORIZONTAL,command=self.Alg.xview)
+        self.scrollBarAlgX.pack(side =BOTTOM,fill =X)
+        self.Alg.pack()
+        self.Alg.config(yscrollcommand=self.scrollBarAlgY.set,xscrollcommand =self.scrollBarAlgX.set)
         self.retriveAlg(self.sunkenButtn['text'])
         self.addButtn = Button(self.frame, text = "Add",command =self.addAlg)
         self.addButtn.grid(row =12, column =0,columnspan=3,sticky = E+W)
         self.deleteBttn = Button(self.frame, text = "Delete",command=self.DeleteAlg)
         self.deleteBttn.grid(row =12, column =3,columnspan=2,sticky = E+W)
-

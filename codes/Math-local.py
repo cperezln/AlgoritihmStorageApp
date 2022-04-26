@@ -65,3 +65,4 @@ if __name__ == '__main__':
     app = Algoritmos(root)
     root.mainloop()#Con esto mantenemos la
     # ventana si no se cerraria tras un milisegundo.Esta accion abre un hilo
+
