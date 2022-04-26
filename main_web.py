@@ -12,12 +12,14 @@ def login():
         if request.form['action'] == 'login':
             req = request.form
             print(req.get('email'), req.get('pass'))
-            if(db.validarAcceso(req.get('email'), req.get('pass'))):
+            if(checkAccessDatabase(req.get('email'), req.get('pass'))[0]):
                 return redirect('/index')
             else:
                 return render_template("login.html", error = "User not found")
-        elif request.form['action'] == 'register':
-            pass
+
+@app.route('/register', methods = ['GET', 'POST'])
+def register():
+    pass
 @app.route('/index', methods = ['GET', 'POST'])
 def home():
     return render_template("index.html")
@@ -83,6 +85,8 @@ def community(algorithm = ""):
             s.append(lines[j])
     return render_template("render_alg.html", code_list = s)
 
+def checkAccessDatabase(self, user, con):
+    return db.validarAcceso(user, con)
 
 if __name__ == '__main__':
     app.run(debug=True)
