@@ -11,7 +11,6 @@ def login():
     if[request.method == 'POST']:
         if request.form['action'] == 'login':
             req = request.form
-            print(req.get('email'), req.get('pass'))
             if(checkAccessDatabase(req.get('email'), req.get('pass'))[0]):
                 return redirect('/index')
             else:
@@ -85,8 +84,13 @@ def community(algorithm = ""):
             s.append(lines[j])
     return render_template("render_alg.html", code_list = s)
 
-def checkAccessDatabase(self, user, con):
+def checkAccessDatabase(user, con):
     return db.validarAcceso(user, con)
+
+@app.route('/local')
+def login_local():
+    content = request.json
+    return checkAccessDatabase(content[0], content[1])
 
 if __name__ == '__main__':
     app.run(debug=True)
