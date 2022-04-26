@@ -30,7 +30,7 @@ class UserDatabaseAccess:
         query2 = 'SELECT * FROM usuarios WHERE correo = "{}"'.format(email)
         aux = self.validacion_correo(email)
         print(self.db_consulta(query2))
-        return(aux[0],aux[1],self.validacion_nombre(name),self.validacion_contrasena(password),len(self.db_consulta(query1 ))!=0,len(self.db_consulta(query2))==0)
+        return(aux[0],aux[1],self.validacion_nombre(name),self.validacion_contrasena(password),len(self.db_consulta(query1))==0,len(self.db_consulta(query2))==0)
 
     def validarAcceso(self,text,con):
         contrasena =  hash_sha3_224 = hashlib.new("sha3_224", con.encode())
@@ -42,6 +42,8 @@ class UserDatabaseAccess:
             resul = self.db_consulta(query)
         return ( resul != [], resul)
 
+    def name(self, email):
+        return self.db_consulta('SELECT nombre FROM usuarios WHERE correo = "{}"'.format(email))
     def db_consulta(self, consulta, parametros=()):
         with self.engine.connect() as con:
             # Como aqui obtenemos un puntero, extraeremos los datos y los almacenaremos en una variable

@@ -12,13 +12,35 @@ def login():
         if request.form['action'] == 'login':
             req = request.form
             if(checkAccessDatabase(req.get('email'), req.get('pass'))[0]):
-                return redirect('/index')
+                return redirect(url_for('home'))
             else:
                 return render_template("login.html", error = "User not found")
 
-@app.route('/register', methods = ['GET', 'POST'])
+@app.route('/register')
 def register():
-    pass
+    return render_template('register.html')
+
+@app.route('/register_database', methods = ['GET', 'POST'])
+def register_database():
+    if [request.method == 'POST']:
+        if request.form['action'] == 'register':
+            req = request.form
+            b1, b2, b3, b4, b5, b6 = db.validarRegistro(req.get('username'), req.get('pass'), req.get('email'))
+            if(not b1 or not b2):
+                return render_template('register.html', error = "The email is not correct")
+            elif(not b3):
+                return render_template('register.html', error = "The username is not correct")
+            elif(not b4):
+                return render_template('register.html', error = "The password is not correct")
+            elif(not b5):
+                return render_template('register.html', error = "The username is already register")
+            elif(not b6):
+                return render_template('register.html', error = "The email is already register")
+            else:
+                db.insertarUsuario([req.get('username'), req.get('pass'), req.get('email')])
+                return redirect('/')
+
+
 @app.route('/index', methods = ['GET', 'POST'])
 def home():
     return render_template("index.html")
