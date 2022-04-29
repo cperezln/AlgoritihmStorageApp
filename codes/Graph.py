@@ -16,6 +16,9 @@ def bfs(visited, graph, node): #function for BFS
       if neighbour not in visited:
         visited.append(neighbour)
         queue.append(neighbour)
+
+---
+
 #Dijkstra
 '''
     Autor: Admin
@@ -43,3 +46,5 @@ def dijkstra(self, start_vertex):
                         pq.put((new_cost, neighbor))
                         D[neighbor] = new_cost
     return D
+
+---

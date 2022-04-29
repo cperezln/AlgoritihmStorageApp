@@ -6,3 +6,11 @@
 
 def hello_world():
     print("Hello World!")
+
+---
+
+#Bona Tarde
+def lol
+
+---
+

@@ -25,3 +25,5 @@ def knapSack(W, wt, val, n):
                 K[i][w] = K[i - 1][w]
 
     return K[n][W]
+
+---
