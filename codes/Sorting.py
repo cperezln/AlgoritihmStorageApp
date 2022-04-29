@@ -36,6 +36,9 @@ def mergeSort(myList):
             myList[k] = right[j]
             j += 1
             k += 1
+
+---
+
 #Quicksort
 '''
     Autor: admin
@@ -62,4 +65,6 @@ def quickSort(array, low, high):
     quickSort(array, low, pi - 1)
 
     quickSort(array, pi + 1, high)
+
+---
 

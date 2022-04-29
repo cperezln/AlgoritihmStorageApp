@@ -7,6 +7,9 @@ def gcd(x, y):
     while y != 0:
         (x, y) = (y, x % y)
     return x
+
+---
+
 #Cribe
 '''
     Autor: Admin
@@ -26,3 +29,5 @@ def cribe(n):
 				h += 1
 
 	return primes, isPrime
+
+---

@@ -75,14 +75,16 @@
                 <div class="ms-2 me-auto">
                     <div class="fw-bold">Community</div>
                     <div class="ms-2 me-auto">
-                        <ol><a href = "/community/Hello World">Hello World</a></ol>
+                        {% for i in Community %}
+                        <ol><a href = "/community/{{ i }}"> {{ i }} </a></ol>
+                        {% endfor %}
                     </div>
                 </div>
             </li>
         </ol>
     </div>
     <div class = "container-fluid" style="float: right; width: 50%; background-color: #eee;  border: 1px solid #999; display: block; padding: 2%">
-        <code> {%block code%}
+        <code> {% block code %}
                 {% endblock %}
         </code>
     </div>

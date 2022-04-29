@@ -11,7 +11,7 @@ def login():
     if[request.method == 'POST']:
         if request.form['action'] == 'login':
             req = request.form
-            if(checkAccessDatabase(req.get('email'), req.get('pass'))[0]):
+            if(check_access_database(req.get('email'), req.get('pass'))[0]):
                 return redirect(url_for('home'))
             else:
                 return render_template("login.html", error = "User not found")
@@ -43,7 +43,8 @@ def register_database():
 
 @app.route('/index', methods = ['GET', 'POST'])
 def home():
-    return render_template("index.html")
+    ls = get_community()
+    return render_template("index.html", Community = ls)
 
 @app.route('/sorting/<algorithm>')
 def sorting(algorithm = ""):
@@ -51,11 +52,14 @@ def sorting(algorithm = ""):
     with open("codes/Sorting.py") as f:
         lines = f.readlines()
         i = 0
-        while lines[i] != "#"+algorithm+"\n":
-            i+=1
+        while lines[i] != "#" + algorithm + "\n":
+            i += 1
         for j in range(i + 1, len(lines)):
-            s.append(lines[j])
-    return render_template("render_alg.html", code_list = s)
+            if lines[j] != "---\n":
+                s.append(lines[j])
+            else:
+                break
+    return render_template("render_alg.html", code_list = s, Community = get_community())
 
 @app.route('/math/<algorithm>')
 def math(algorithm = ""):
@@ -63,11 +67,14 @@ def math(algorithm = ""):
     with open("codes/Math.py") as f:
         lines = f.readlines()
         i = 0
-        while lines[i] != "#"+algorithm+"\n":
-            i+=1
+        while lines[i] != "#" + algorithm + "\n":
+            i += 1
         for j in range(i + 1, len(lines)):
-            s.append(lines[j])
-    return render_template("render_alg.html", code_list = s)
+            if lines[j] != "---\n":
+                s.append(lines[j])
+            else:
+                break
+    return render_template("render_alg.html", code_list = s, Community = get_community())
 
 @app.route('/dp/<algorithm>')
 def dp(algorithm = ""):
@@ -75,11 +82,14 @@ def dp(algorithm = ""):
     with open("codes/Dynammic Programming.py") as f:
         lines = f.readlines()
         i = 0
-        while lines[i] != "#"+algorithm+"\n":
-            i+=1
+        while lines[i] != "#" + algorithm + "\n":
+            i += 1
         for j in range(i + 1, len(lines)):
-            s.append(lines[j])
-    return render_template("render_alg.html", code_list = s)
+            if lines[j] != "---\n":
+                s.append(lines[j])
+            else:
+                break
+    return render_template("render_alg.html", code_list = s, Community = get_community())
 
 @app.route('/graph/<algorithm>')
 def graphs(algorithm = ""):
@@ -87,11 +97,14 @@ def graphs(algorithm = ""):
     with open("codes/Graph.py") as f:
         lines = f.readlines()
         i = 0
-        while lines[i] != "#"+algorithm+"\n":
-            i+=1
+        while lines[i] != "#" + algorithm + "\n":
+            i += 1
         for j in range(i + 1, len(lines)):
-            s.append(lines[j])
-    return render_template("render_alg.html", code_list = s)
+            if lines[j] != "---\n":
+                s.append(lines[j])
+            else:
+                break
+    return render_template("render_alg.html", code_list = s, Community = get_community())
 
 
 @app.route('/community/<algorithm>')
@@ -103,18 +116,42 @@ def community(algorithm = ""):
         while lines[i] != "#"+algorithm+"\n":
             i+=1
         for j in range(i + 1, len(lines)):
-            s.append(lines[j])
-    return render_template("render_alg.html", code_list = s)
-
-def checkAccessDatabase(user, con):
-    return db.validarAcceso(user, con)
+            if lines[j] != "---\n":
+                s.append(lines[j])
+            else:
+                break
+    return render_template("render_alg.html", code_list = s, Community = get_community())
 
 @app.route('/local')
 def login_local():
     content = request.json
-    result =checkAccessDatabase(content[0], content[1])
-    print(result )
+    result = check_access_database(content[0], content[1])
+    print(result)
     return  Response(json.dumps({'b1':result[0], 'res': list(result[1][0])}))
+
+def check_access_database(user, con):
+    return db.validarAcceso(user, con)
+
+def get_community():
+    with(open("codes/Community.py")) as f:
+        lines = f.readlines()
+        res = []
+        for i in lines:
+            if i.startswith('#'):
+                i = i[1::]
+                res.append(i)
+    return res
+
+@app.rout('/upload', methods = ['POST'])
+def upload_com():
+    content = request.json
+    name = content['name']
+    user = content['user']
+    desc = content['description']
+    code = content['content']
+    with open('codes/Community.py', "a") as f:
+        new_code = "#{}\n'''Autor: {}\n{}'''\n{}".format(name, user, desc, code)
+        f.write(new_code)
 
 if __name__ == '__main__':
     app.run(debug=True)
