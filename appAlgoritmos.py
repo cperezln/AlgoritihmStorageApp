@@ -61,7 +61,11 @@ class Algoritmos:
         self.mensaje['text']=''
         try:
             r1=requests.get('http://127.0.0.1:5000/local',json=[self.nombre.get(),self.contrasena.get()])
-            r = r1.json()
+            if r1.ok:
+                r = r1.json()
+            else:
+                self.mensaje['text'] ='Usuario o contraseña incorrectos'
+
 
         except:
             self.mensaje['text'] ='Servicio no disponible, intentelo más tarde'
@@ -88,7 +92,7 @@ class Algoritmos:
         print(bttn_name)
         for fila in self.contentTable.get_children():
             self.contentTable.delete(fila)
-        if bttn_name != "Community" and bttn_name !="":
+        if bttn_name !="":
             with  open('codes/{}-local.py'.format(bttn_name), 'r') as e:
                 i =0
                 alg =e.read()
@@ -113,7 +117,7 @@ class Algoritmos:
                         self.SavedAlg.append([aux2[0].replace("\n",""),aux2[1], aux2[2]])
 
         else:
-            pass
+            self.mensaje['text'] ="Select a category"
 
 
 
@@ -200,7 +204,7 @@ class Algoritmos:
         if filename != "" and len(alg_name) != 0 and (self.rad_value.get()==1 or self.rad_value.get()==2) and len(self.category_bttn.get())>0:
 
             self.storeFile(filename, alg_name,self.rad_value.get(),self.description.get("1.0",END),self.category_bttn.get())
-            self.mensaje['text'] = "Algorith added successfully"
+
             self.window_add.grab_release()
             self.window_add.destroy()
             delattr(self,"window_add")
@@ -226,21 +230,34 @@ class Algoritmos:
             print("you clicked on",item )
 
     def storeFile(self,file,alg_name,visibility, des,cat):
-        with  open('codes/{}-local.py'.format(cat),'a') as e:
-            e.write("#Autor##"+self.usuarioAct+"\n")
-            e.write("##"+alg_name+"\n")
-            if (visibility ==1):
-                e.write("##public\n")
-            else:
-                e.write("##private\n")
-            e.write("'''\n{}'''\n".format(des))
-            with open(file,"r") as e2:
-                e.write(e2.read())
+        try:
+            with  open('codes/{}-local.py'.format(cat),'a') as e:
+                e.write("#Autor##"+self.usuarioAct+"\n")
+                e.write("##"+alg_name+"\n")
+                if (visibility ==1):
+                    e.write("##public\n")
+                else:
+                    e.write("##private\n")
+                e.write("'''\n{}'''\n".format(des))
+                with open(file,"r") as e2:
+                    e.write(e2.read())
+            self.mensaje['text'] = "Algorithm added successfully"
+        except:
+            self.mensaje['text'] = "There was an error adding the algorithm"
         if visibility == 1:
-            pass
+            try:
+                with open(file, "r") as e2:
+                    r =requests.post('http://127.0.0.1:5000/local', json={"name": alg_name, "user": self.usuarioAct,
+                                                                       "description": des,
+                                                                     "content": e2.read()})
+                    self.mensaje['text'] = "Algorithm added successfully"
+                    if not r.ok:
+                        self.mensaje['text'] = 'There was an error adding the algorithm'
+            except:
+                self.mensaje['text'] = 'There was an error adding the algorithm'
 
-    def DeleteAlg(self):
-        pass
+
+
     def Acceso(self):
         # Esta función lo que hará es que la pestaña de categoría seleccionada se quede selecionada
         #y se deseleccione la anterior
@@ -279,14 +296,12 @@ class Algoritmos:
         self.DynamicButn = Button(self.frame, text="Dynammic Programming" )
         self.DynamicButn.configure(command=lambda:leavePressed(self.DynamicButn))
         self.DynamicButn.grid(row=0, column=3,sticky = E+W)
-        self.CommunityButn = Button(self.frame, text="Community")
-        self.CommunityButn.configure(command=lambda:leavePressed(self.CommunityButn))
         self.sunkenButtn = self.mathsButn
-        self.CommunityButn.grid(row=0, column=4,sticky = E+W)
         self.cuadroParaTabla = Frame(self.frame,height =13)
-        self.cuadroParaTabla.grid(row =1, rowspan = 13, columnspan = 5)
+        #Esto no se porque es pero si pongo row 1 la tabla se me baja más de la cuenta
+        self.cuadroParaTabla.grid(row =0, rowspan = 13, columnspan = 4)
         self.contentTable = ttk.Treeview(self.cuadroParaTabla, columns = ("nombre","autor","visibility"),show='headings')
-        self.contentTable.grid(row =1, rowspan =13,columnspan=5)
+        self.contentTable.grid(row =0, rowspan =13,columnspan=4)
         self.contentTable.heading('nombre', text ='Name')
         self.contentTable.heading('autor', text='Author')
         self.contentTable.heading('visibility', text='Visibility')
@@ -299,7 +314,7 @@ class Algoritmos:
         #Frame que nos permitirá mostrar los algoritmos
 
         self.showAlg = LabelFrame(self.frame,text ="",font=('times new roman',16,'bold'))
-        self.showAlg.grid(row =0, rowspan = 13, column =5 )
+        self.showAlg.grid(row =0, rowspan = 12, column =4 )
         self.Alg = Text(self.showAlg,state =DISABLED,width=40,height=20,wrap =NONE)
 
 
@@ -311,6 +326,4 @@ class Algoritmos:
         self.Alg.config(yscrollcommand=self.scrollBarAlgY.set,xscrollcommand =self.scrollBarAlgX.set)
         self.retriveAlg(self.sunkenButtn['text'])
         self.addButtn = Button(self.frame, text = "Add",command =self.addAlg)
-        self.addButtn.grid(row =12, column =0,columnspan=3,sticky = E+W)
-        self.deleteBttn = Button(self.frame, text = "Delete",command=self.DeleteAlg)
-        self.deleteBttn.grid(row =12, column =3,columnspan=2,sticky = E+W)
+        self.addButtn.grid(row =11, column =0,columnspan=4,sticky = E+W)

@@ -30,7 +30,7 @@ def cribe(n):
 	return primes, isPrime
 #Autor##Juan Antonio
 ##1
-##public
+##private
 '''
 AAAAA
 AA
