@@ -142,7 +142,7 @@ def get_community():
                 res.append(i)
     return res
 
-@app.rout('/upload', methods = ['POST'])
+@app.route('/upload', methods = ['POST'])
 def upload_com():
     content = request.json
     name = content['name']
@@ -150,8 +150,16 @@ def upload_com():
     desc = content['description']
     code = content['content']
     with open('codes/Community.py', "a") as f:
-        new_code = "#{}\n'''Autor: {}\n{}'''\n{}".format(name, user, desc, code)
+        c = code.split("\n")
+        s_code = ""
+        for i in c:
+            if(not ("#" in i)):
+                print(i)
+                s_code += i
+                s_code += "\n"
+        print(s_code)
+        new_code = "#{}\n'''\n\tAutor: \t{}\n{}'''\n{}".format(name, user, desc, s_code) + "\n---\n"
         f.write(new_code)
-
+    return Response("")
 if __name__ == '__main__':
     app.run(debug=True)

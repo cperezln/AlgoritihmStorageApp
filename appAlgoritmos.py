@@ -230,31 +230,48 @@ class Algoritmos:
             print("you clicked on",item )
 
     def storeFile(self,file,alg_name,visibility, des,cat):
-        try:
-            with  open('codes/{}-local.py'.format(cat),'a') as e:
-                e.write("#Autor##"+self.usuarioAct+"\n")
-                e.write("##"+alg_name+"\n")
-                if (visibility ==1):
-                    e.write("##public\n")
-                else:
-                    e.write("##private\n")
-                e.write("'''\n{}'''\n".format(des))
-                with open(file,"r") as e2:
-                    e.write(e2.read())
-            self.mensaje['text'] = "Algorithm added successfully"
-        except:
-            self.mensaje['text'] = "There was an error adding the algorithm"
+
         if visibility == 1:
             try:
                 with open(file, "r") as e2:
-                    r =requests.post('http://127.0.0.1:5000/local', json={"name": alg_name, "user": self.usuarioAct,
+                    r =requests.post('http://127.0.0.1:5000/upload', json={"name": alg_name, "user": self.usuarioAct,
                                                                        "description": des,
                                                                      "content": e2.read()})
                     self.mensaje['text'] = "Algorithm added successfully"
                     if not r.ok:
                         self.mensaje['text'] = 'There was an error adding the algorithm'
+                    else:
+                        try:
+                            with  open('codes/{}-local.py'.format(cat), 'a') as e:
+                                e.write("#Autor##" + self.usuarioAct + "\n")
+                                e.write("##" + alg_name + "\n")
+                                if (visibility == 1):
+                                    e.write("##public\n")
+                                else:
+                                    e.write("##private\n")
+                                e.write("'''\n{}'''\n".format(des))
+                                with open(file, "r") as e2:
+                                    e.write(e2.read())
+                            self.mensaje['text'] = "Algorithm added successfully"
+                        except:
+                            self.mensaje['text'] = "There was an error adding the algorithm"
             except:
                 self.mensaje['text'] = 'There was an error adding the algorithm'
+        else:
+            try:
+                with  open('codes/{}-local.py'.format(cat),'a') as e:
+                    e.write("#Autor##"+self.usuarioAct+"\n")
+                    e.write("##"+alg_name+"\n")
+                    if (visibility ==1):
+                        e.write("##public\n")
+                    else:
+                        e.write("##private\n")
+                    e.write("'''\n{}'''\n".format(des))
+                    with open(file,"r") as e2:
+                        e.write(e2.read())
+                self.mensaje['text'] = "Algorithm added successfully"
+            except:
+                self.mensaje['text'] = "There was an error adding the algorithm"
 
 
 

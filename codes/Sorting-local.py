@@ -394,3 +394,13 @@ class Algoritmos:
         self.retriveAlg(self.sunkenButtn['text'])
         self.addButtn = Button(self.frame, text = "Add",command =self.addAlg)
         self.addButtn.grid(row =11, column =0,columnspan=4,sticky = E+W)
+#Autor##Juan Antonio
+##sdsd 
+##public
+'''
+sddfs
+'''
+def tusmuertos():
+	hola
+	#holi
+	mamawevo

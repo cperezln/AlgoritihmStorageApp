@@ -8,9 +8,13 @@ def hello_world():
     print("Hello World!")
 
 ---
-
-#Bona Tarde
-def lol
+#sdsd 
+'''
+	Autor: 	Juan Antonio
+sddfs
+'''
+def tusmuertos():
+	hola
+	mamawevo
 
 ---
-
