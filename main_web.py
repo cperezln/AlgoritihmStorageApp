@@ -113,7 +113,8 @@ def community(algorithm = ""):
     with open("codes/Community.py") as f:
         lines = f.readlines()
         i = 0
-        while lines[i] != "#"+algorithm+"\n":
+        while lines[i] != "#" + algorithm + "\n":
+            print(lines[i])
             i+=1
         for j in range(i + 1, len(lines)):
             if lines[j] != "---\n":
