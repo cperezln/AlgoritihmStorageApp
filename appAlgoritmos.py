@@ -3,21 +3,21 @@ from tkinter import ttk
 from tkinter import *
 from tkinter import filedialog
 import re
-import hashlib
+
 from UserDatabaseAccess import UserDatabaseAccess
 import requests
 class Algoritmos:
-    usuarioAct =[]
+    actUser =[]
     SavedAlg = []
     def __init__(self, root):
 
         #variable que se usará para las consultas a la base de datos de los usuarios
         self.dbConsults = UserDatabaseAccess()
-        self.ventana = root  # Almacenamos la ventana
-        self.ventana.wm_iconbitmap('recursos/AppIcon.ico')
-        self.ventana.title("Register")
+        self.window = root  # Almacenamos la ventana
+        self.window.wm_iconbitmap('recursos/AppIcon.ico')
+        self.window.title("Register")
         #Creamos el Labelframe sobre el que introduciremos los elementos para registrar usuarios e iniciar sesion
-        self.frame = LabelFrame(self.ventana, text="register", font=('Calibri', 16, 'bold'))
+        self.frame = LabelFrame(self.window, text="register", font=('Calibri', 16, 'bold'))
         s = ttk.Style()
         s.configure('my.TButton', font=('Calibri', 14, 'bold'))
 
@@ -33,66 +33,61 @@ class Algoritmos:
         self.frame.grid(row=0, column=0, columnspan=5, pady=20, rowspan=3, padx=10)
 
         # Fila del nombre del usuario a logear
-        etiqueta_nombre = Label(self.frame, text="Nombre: ", font=('Calibri', 13))
-        etiqueta_nombre.grid(row=1, column=0)
-        self.nombre = Entry(self.frame, font=('Calibri', 13))
-        self.nombre.grid(row=1, column=1, columnspan=5)
-        self.nombre.focus()
+        name_label = Label(self.frame, text="Name: ", font=('Calibri', 13))
+        name_label.grid(row=1, column=0)
+        self.name = Entry(self.frame, font=('Calibri', 13))
+        self.name.grid(row=1, column=1, columnspan=5)
+        self.name.focus()
 
         # Fila de la contraseña del usuario a logear
-        etiqueta_contrasena = Label(self.frame, text="Contraseña: ", font=('Calibri', 13))
-        etiqueta_contrasena.grid(row=2, column=0)
-        self.contrasena = Entry(self.frame, font=('Calibri', 13), show='*')
-        self.contrasena.grid(row=2, column=1, columnspan=5)
+        password_label = Label(self.frame, text="Password: ", font=('Calibri', 13))
+        password_label.grid(row=2, column=0)
+        self.password = Entry(self.frame, font=('Calibri', 13), show='*')
+        self.password.grid(row=2, column=1, columnspan=5)
 
         # Boton para altenar con la pantalla de registro de nuevo usuario
 
         #Boton para confirmar los datos introducidos
 
-        boton_login = ttk.Button(self.frame, text="Confirmar", command=self.InicioSesion, style='my.TButton')
-        boton_login.grid(row=3, column=3, columnspan=3)
+        login_bttn = ttk.Button(self.frame, text="Confirmar", command=self.InicioSesion, style='my.TButton')
+        login_bttn.grid(row=3, column=3, columnspan=3)
 
        #Compartimento en el que se indicara si el usuario con la contraseña introducido se encuntra en la base de datos
 
-        self.mensaje = Label(self.frame,text="", fg='red')
-        self.mensaje.grid(row=4, column=0, columnspan=6, sticky=W + E)
+        self.message = Label(self.frame,text="", fg='red')
+        self.message.grid(row=4, column=0, columnspan=6, sticky=W + E)
 
     def InicioSesion(self):
-        self.mensaje['text']=''
+        self.message['text']=''
         try:
-            r1=requests.get('http://127.0.0.1:5000/local',json=[self.nombre.get(),self.contrasena.get()])
+            r1=requests.get('http://127.0.0.1:5000/local',json=[self.name.get(),self.password.get()])
             if r1.ok:
                 r = r1.json()
             else:
-                self.mensaje['text'] ='Usuario o contraseña incorrectos'
-
-
+                self.message['text'] ='Wrong user or password'
         except:
-            self.mensaje['text'] ='Servicio no disponible, intentelo más tarde'
+            self.message['text'] ='Service unable, try again later'
             return
-        print(r)
         if (r["b1"]):
-            self.usuarioAct = r['res'][0]
-            print(self.usuarioAct)
+            self.actUser = r['res'][0]
             for widget in self.frame.winfo_children():
                 widget.destroy()
-            delattr(self, "nombre")
-            delattr(self, "contrasena")
+            delattr(self, "name")
+            delattr(self, "password")
             try:
-                delattr(self, "correo")
+                delattr(self, "mail")
             except( Exception ):
                 pass
 
             self.Acceso()
         else:
-            self.mensaje['text']='Usuario o contraseña incorrectos'
+            self.message['text']='Wrong user or password'
 
 
     def retriveAlg(self,bttn_name):
-        print(bttn_name)
-        for fila in self.contentTable.get_children():
-            self.contentTable.delete(fila)
-        if bttn_name !="":
+        for row in self.contentTable.get_children():
+            self.contentTable.delete(row)
+        if bttn_name != "":
             with  open('codes/{}-local.py'.format(bttn_name), 'r') as e:
                 i =0
                 alg =e.read()
@@ -101,14 +96,12 @@ class Algoritmos:
                 for string in alg :
                     aux = string.split("##")
 
-                    if (self.usuarioAct == aux[1].replace('\n','')  ):
+                    if (self.actUser == aux[1].replace('\n','')  ):
                         aux2 = aux[3].split("'''")
-                        print(aux2)
                         self.contentTable.insert('', 0,iid =i ,values=(aux[2].replace("\n",""),aux[1].replace("\n",""), aux2[0].replace("\n","")))
                         i+=1
                         self.SavedAlg.append([aux[2].replace("\n",""),aux2[1],aux2[2]])
-                        #self.contentTable.insert(id,0,text=aux2[1])
-                        #self.contentTable.insert(id, 1,text=aux2[2])
+
                     if ("Admin" == aux[1].replace('\n','')):
 
                         aux2 = aux[2].split("'''")
@@ -117,10 +110,8 @@ class Algoritmos:
                         self.SavedAlg.append([aux2[0].replace("\n",""),aux2[1], aux2[2]])
 
         else:
-            self.mensaje['text'] ="Select a category"
-
-
-
+            #Creo que esto no es necesari pero he decidido dejarlo por si acaso
+            self.message['text'] ="Select a category"
 
     filename =''
     def addAlg(self):
@@ -187,20 +178,20 @@ class Algoritmos:
         #Boton para confimar
         self.confirm_bttn = Button(frame_add, text="Confirm",command =self.storeAlg)
         self.confirm_bttn.grid(row =7,column = 0,columnspan =3 ,sticky=E+W)
-        self.mensaje2 = Label(frame_add,text="", fg='red')
-        self.mensaje2.grid(row =8,column = 0, columnspan =3, sticky = E+W)
+        self.message2 = Label(frame_add,text="", fg='red')
+        self.message2.grid(row =8,column = 0, columnspan =3, sticky = E+W)
 
     def storeAlg(self):
-        self.mensaje2["text"]=""
+        self.message2["text"]=""
         alg_name = self.alg_name.get("1.0",END).replace("\r","").replace("\n"," ")
         if (len(alg_name) < 2):
-            self.mensaje2["text"] += "Add a name "
+            self.message2["text"] += "Add a name "
         if (not (self.rad_value.get() == 1 or self.rad_value.get() == 2)):
-            self.mensaje2["text"] += " select a visibility option "
+            self.message2["text"] += " select a visibility option "
         if (filename == ""):
-            self.mensaje2["text"] += " select a .py file"
+            self.message2["text"] += " select a .py file"
         if (len(self.category_bttn.get())==0):
-            self.mensaje2["text"] += " select a category"
+            self.message2["text"] += " select a category"
         if filename != "" and len(alg_name) != 0 and (self.rad_value.get()==1 or self.rad_value.get()==2) and len(self.category_bttn.get())>0:
 
             self.storeFile(filename, alg_name,self.rad_value.get(),self.description.get("1.0",END),self.category_bttn.get())
@@ -208,14 +199,13 @@ class Algoritmos:
             self.window_add.grab_release()
             self.window_add.destroy()
             delattr(self,"window_add")
-            delattr(self, "mensaje2")
+            delattr(self, "message2")
             delattr(self, "confirm_bttn")
             delattr(self, "description")
             delattr(self, "rad_value")
             delattr(self, "alg_name")
             delattr(self, "image")
             delattr(self, "category_bttn")
-            print(self.__dict__)
             self.SavedAlg = []
             self.retriveAlg(self.sunkenButtn['text'])
     def OnClick(self,event):
@@ -227,23 +217,22 @@ class Algoritmos:
             self.Alg.delete('1.0', END)
             self.Alg.insert('1.0',self.SavedAlg[int(item)][1]+self.SavedAlg[int(item)][2])
             self.Alg.configure(state='disabled')
-            print("you clicked on",item )
 
     def storeFile(self,file,alg_name,visibility, des,cat):
 
         if visibility == 1:
             try:
                 with open(file, "r") as e2:
-                    r =requests.post('http://127.0.0.1:5000/upload', json={"name": alg_name, "user": self.usuarioAct,
+                    r =requests.post('http://127.0.0.1:5000/upload', json={"name": alg_name, "user": self.actUser,
                                                                        "description": des,
                                                                      "content": e2.read()})
-                    self.mensaje['text'] = "Algorithm added successfully"
+                    self.message['text'] = "Algorithm added successfully"
                     if not r.ok:
-                        self.mensaje['text'] = 'There was an error adding the algorithm'
+                        self.message['text'] = 'There was an error adding the algorithm'
                     else:
                         try:
                             with  open('codes/{}-local.py'.format(cat), 'a') as e:
-                                e.write("#Autor##" + self.usuarioAct + "\n")
+                                e.write("#Autor##" + self.actUser + "\n")
                                 e.write("##" + alg_name + "\n")
                                 if (visibility == 1):
                                     e.write("##public\n")
@@ -252,15 +241,15 @@ class Algoritmos:
                                 e.write("'''\n{}'''\n".format(des))
                                 with open(file, "r") as e2:
                                     e.write(e2.read())
-                            self.mensaje['text'] = "Algorithm added successfully"
+                            self.message['text'] = "Algorithm added successfully"
                         except:
-                            self.mensaje['text'] = "There was an error adding the algorithm"
+                            self.message['text'] = "There was an error adding the algorithm"
             except:
-                self.mensaje['text'] = 'There was an error adding the algorithm'
+                self.message['text'] = 'There was an error adding the algorithm'
         else:
             try:
                 with  open('codes/{}-local.py'.format(cat),'a') as e:
-                    e.write("#Autor##"+self.usuarioAct+"\n")
+                    e.write("#Autor##"+self.actUser+"\n")
                     e.write("##"+alg_name+"\n")
                     if (visibility ==1):
                         e.write("##public\n")
@@ -269,9 +258,9 @@ class Algoritmos:
                     e.write("'''\n{}'''\n".format(des))
                     with open(file,"r") as e2:
                         e.write(e2.read())
-                self.mensaje['text'] = "Algorithm added successfully"
+                self.message['text'] = "Algorithm added successfully"
             except:
-                self.mensaje['text'] = "There was an error adding the algorithm"
+                self.message['text'] = "There was an error adding the algorithm"
 
 
 
@@ -293,14 +282,14 @@ class Algoritmos:
                 self.sunkenButtn = None
                 self.retriveAlg('')
 
-        self.ventana.title("Algorithm App")
+        self.window.title("Algorithm App")
         self.frame.configure(text="Algoritmos")
         for widget in self.frame.winfo_children():
             widget.destroy()
 
         self.frame.grid(row=0, column=0, columnspan=6, pady=20, rowspan=14, padx=10)
-        self.mensaje =Label(self.frame, text="", fg='red')
-        self.mensaje.grid(row =13, column =1, columnspan = 9)
+        self.message =Label(self.frame, text="", fg='red')
+        self.message.grid(row =13, column =1, columnspan = 9)
         self.mathsButn = Button(self.frame, text = "Math")
         self.mathsButn.configure(command = lambda:leavePressed(self.mathsButn),relief="sunken")
         self.mathsButn.grid(row=0, column=0,sticky = E+W)
@@ -317,9 +306,9 @@ class Algoritmos:
         self.cuadroParaTabla = Frame(self.frame,height =13)
         #Esto no se porque es pero si pongo row 1 la tabla se me baja más de la cuenta
         self.cuadroParaTabla.grid(row =0, rowspan = 13, columnspan = 4)
-        self.contentTable = ttk.Treeview(self.cuadroParaTabla, columns = ("nombre","autor","visibility"),show='headings')
+        self.contentTable = ttk.Treeview(self.cuadroParaTabla, columns = ("name","autor","visibility"),show='headings')
         self.contentTable.grid(row =0, rowspan =13,columnspan=4)
-        self.contentTable.heading('nombre', text ='Name')
+        self.contentTable.heading('name', text ='Name')
         self.contentTable.heading('autor', text='Author')
         self.contentTable.heading('visibility', text='Visibility')
         self.contentTable.pack(side = LEFT)
