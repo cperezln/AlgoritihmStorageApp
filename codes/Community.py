@@ -333,4 +333,19 @@ class Algoritmos:
 
 
 ---
+#Hola mundo
+'''
+	Autor: 	Juan Antonio
+Acabamos elegir una de las categorias
+'''
+from appAlgoritmos import Algoritmos
+from tkinter import ttk
+from tkinter import *
+from sqlalchemy import create_engine
+if __name__ == '__main__':
+
+    app = Algoritmos(root)
+
+
+---
 

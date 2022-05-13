@@ -127,8 +127,11 @@ def community(algorithm = ""):
 def login_local():
     content = request.json
     result = check_access_database(content[0], content[1])
-    print(result)
-    return  Response(json.dumps({'b1':result[0], 'res': list(result[1][0])}))
+
+    if( result[0] ):
+        return  Response(json.dumps({'b1':result[0], 'res': list(result[1][0])}))
+    else:
+        return Response(json.dumps({'b1': result[0], 'res': []}))
 
 def check_access_database(user, con):
     return db.validarAcceso(user, con)

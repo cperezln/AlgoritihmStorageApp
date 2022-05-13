@@ -67,4 +67,3 @@ if __name__ == '__main__':
     # ventana si no se cerraria tras un milisegundo.Esta accion abre un hilo
 
 
-
