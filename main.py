@@ -1,7 +1,10 @@
+
+"""
+AUTOR : JUAN ANTONIO GORDILLO
+"""
+
 from appAlgoritmos import Algoritmos
-from tkinter import ttk
 from tkinter import *
-from sqlalchemy import create_engine
 if __name__ == '__main__':
 
     root =Tk() #ventana principal

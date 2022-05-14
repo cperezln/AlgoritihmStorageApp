@@ -1,3 +1,8 @@
+
+"""
+AUTOR : JUAN ANTONIO GORDILLO
+"""
+
 import tkinter
 from tkinter import ttk
 from tkinter import *
