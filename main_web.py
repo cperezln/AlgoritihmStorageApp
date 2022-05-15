@@ -3,9 +3,18 @@ from flask import Flask, render_template, request, redirect, url_for, Response
 import json
 app = Flask(__name__)
 db = db.UserDatabaseAccess()
+
+'''
+    AUTOR: Cristian Pérez Corral
+    Clase de gestión de peticiones HTTP para la aplciación web,
+    actúa a su vez como servidor web
+'''
+
+#Página principal. Carga el login
 @app.route('/')
 def main():
     return render_template("login.html", error = "")
+#Método que se encarga de acceder a la base de datos para comprobar el login, y dar error en caso de que esté mal
 @app.route('/login',  methods = ['GET', 'POST'])
 def login():
     if[request.method == 'POST']:
@@ -16,10 +25,12 @@ def login():
             else:
                 return render_template("login.html", error = "User not found")
 
+#Método que se encarga de cargar la página de registro
 @app.route('/register')
 def register():
     return render_template('register.html')
 
+#Método que se encarga de comprobar que /to/do el registro esté correcto
 @app.route('/register_database', methods = ['GET', 'POST'])
 def register_database():
     if [request.method == 'POST']:
@@ -40,11 +51,13 @@ def register_database():
                 db.insertarUsuario([req.get('username'), req.get('pass'), req.get('email')])
                 return redirect('/')
 
-
+#Este método nos permite cargar la página principal. Cargamos también los algoritmos de Community, por si hay alguno nuevo-
 @app.route('/index', methods = ['GET', 'POST'])
 def home():
     ls = get_community()
     return render_template("index.html", Community = ls)
+
+#El resto de métodos se encargar de parsear los algoritmos correspondientes a cada categoría.
 
 @app.route('/sorting/<algorithm>')
 def sorting(algorithm = ""):
@@ -133,6 +146,7 @@ def login_local():
     else:
         return Response(json.dumps({'b1': result[0], 'res': []}))
 
+#Este método se encarga de chequear el acceso en la base de datos
 def check_access_database(user, con):
     return db.validarAcceso(user, con)
 
@@ -165,5 +179,7 @@ def upload_com():
         new_code = "#{}\n'''\n\tAutor: \t{}\n{}'''\n{}".format(name, user, desc, s_code) + "\n---\n"
         f.write(new_code)
     return Response("")
+
+
 if __name__ == '__main__':
     app.run(debug=True)
